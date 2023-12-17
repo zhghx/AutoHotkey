@@ -3,6 +3,7 @@
     "jp",68224017,
     "en",67699721
 )
+
 ; enAppList :=[2
 ; "pwsh.exe"
 ; ]
@@ -13,11 +14,21 @@ getCurrentIMEID(){
     InputLocaleID:=DllCall("GetKeyboardLayout", "UInt", ThreadID, "UInt")
     return InputLocaleID
 }
+
 ; 使用IMEID激活对应的输入法
 switchIMEbyID(IMEID){
     winTitle:=WinGetTitle("A")
-    PostMessage(0x50, 0, IMEID,, WinTitle )
+    if (winTitle = "") {
+        MsgBox("当前没有活动窗口。")
+        return
+    }
+    if WinExist(winTitle) {
+        PostMessage(0x50, 0, IMEID,, winTitle)
+    } else {
+        MsgBox("无法找到窗口：" winTitle)
+    }
 }
+
 ; 切换微软日文输入法（英文模式）
 sc07B::{
     switchIMEbyID(IMEmap["jp"])
@@ -26,6 +37,7 @@ sc07B::{
     Send("{sc029}")
     ; SetCapsLockState "alwaysoff"
 }
+
 ; 切换微软日文输入法（日文模式）
 sc079::{
     switchIMEbyID(IMEmap["jp"])
@@ -33,6 +45,7 @@ sc079::{
     Send("{sc070}")
     ; SetCapsLockState "alwaysoff"
 }
+
 ; 切换微软拼音输入法 !F2
 sc070::{
     switchIMEbyID(IMEmap["zh"])
